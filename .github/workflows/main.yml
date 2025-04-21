@@ -1,0 +1,19 @@
+import requests
+import xmltodict
+import csv
+
+url = "https://kokkai.ndl.go.jp/api/1.0/speech?sessionFrom=210&sessionTo=210&recordPacking=xml"
+
+resp = requests.get(url)
+data = xmltodict.parse(resp.content)
+speeches = data["results"]["speechRecord"]
+
+with open("data/bills.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["date", "speaker", "speech"])
+    for item in speeches:
+        writer.writerow([
+            item.get("date"),
+            item.get("speaker", "N/A"),
+            item.get("speech", "").replace("\n", "")
+        ])
